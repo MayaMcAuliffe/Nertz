@@ -12,9 +12,11 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        let tabletop = TabletopController(view: view)
+        view.addSubview(tabletop.tabletopView)
     }
-
+    
+    
 
 }
 
