@@ -22,12 +22,13 @@ class CardController {
     var gestureDelegate: CardGestureDelegate
     
     init(num: Int, width: Int, height: Int, gestureDel: CardGestureDelegate) { // pass in numbers 0 - 51
-        id = num + 1
-        suit = (num % 13) + 1
-        val = (num / 13) + 1
-        gestureDelegate = gestureDel
         
-        let temp = (num / 13) + 1
+        id = num + 1
+        suit = (num / 13) + 1
+        val = (num % 13) + 1
+        gestureDelegate = gestureDel
+        print("num: " , num, ", suit: ", suit, ", val: ", val)
+        let temp = (num % 13) + 1
         var imageName = ""
         if temp > 1 && temp < 11  {
             imageName = String(temp) + "_of_"
@@ -87,13 +88,15 @@ class CardController {
         cardView.image = back
     }
     
+    func bringToFront(superview: UIView) {
+        superview.bringSubview(toFront: cardView)
+    }
+    
     @objc func cardClicked(_ sender: UITapGestureRecognizer) {
-        print("card click method")
         gestureDelegate.cardClicked(cardController: self, gestureRecognizer: sender)
     }
     
     @objc func cardDragged(_ sender: UIPanGestureRecognizer) {
-        print("card drag method")
         gestureDelegate.cardDragged(cardController: self, gestureRecognizer: sender)
     }
 }

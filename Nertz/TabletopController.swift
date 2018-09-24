@@ -27,6 +27,7 @@ class TabletopController: CardGestureDelegate { // conforms to drag delegate
         tabletopView.image = #imageLiteral(resourceName: "wood")
         deckOrigin = CGPoint(x: (tabletopView.frame.width - CGFloat(cardWidth * (numTurnUps + 1))) / CGFloat(2 + numTurnUps), y: tabletopView.frame.maxY - CGFloat(cardHeight) - 20)
         turnPileOrigin = CGPoint(x: (tabletopView.frame.width - CGFloat(cardWidth * (numTurnUps + 1))) / CGFloat(2 + numTurnUps), y: tabletopView.frame.maxY - 2 * CGFloat(cardHeight) - 40)
+        tabletopView.isUserInteractionEnabled = true
         setupBoard()
     }
     
@@ -94,9 +95,9 @@ class TabletopController: CardGestureDelegate { // conforms to drag delegate
     }
     
     func cardClicked(cardController: CardController, gestureRecognizer: UITapGestureRecognizer) {
-        print("in tabletop click func")
-        cardController.turnFaceUp()
+        cardController.bringToFront(superview: tabletopView)
         cardController.moveTo(location: turnPileOrigin)
+        cardController.turnFaceUp()
         deckArray.removeLast()
         pileArray.append(cardController)
     }
