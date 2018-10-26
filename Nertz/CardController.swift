@@ -72,12 +72,19 @@ class CardController {
         clickRecognizer = UITapGestureRecognizer(target: self, action: #selector(cardClicked(_:)))
         dragRecognizer = UIPanGestureRecognizer(target: self, action: #selector(cardDragged(_:)))
         cardView.addGestureRecognizer(clickRecognizer)
-        cardView.addGestureRecognizer(dragRecognizer)
+        //cardView.addGestureRecognizer(dragRecognizer)
     }
     
     func moveTo(location: CGPoint) {
         cardView.frame.origin.x = location.x
         cardView.frame.origin.y = location.y
+    }
+    
+    func animatedMoveTo(location: CGPoint) {
+        UIView.animate(withDuration: 0.2) {
+            self.cardView.frame.origin.x = location.x
+            self.cardView.frame.origin.y = location.y
+        }
     }
     
     func turnFaceUp() {
@@ -90,6 +97,22 @@ class CardController {
     
     func bringToFront(superview: UIView) {
         superview.bringSubview(toFront: cardView)
+    }
+    
+    func addClickGesture() {
+        cardView.addGestureRecognizer(clickRecognizer)
+    }
+    
+    func removeClickGesture() {
+        cardView.removeGestureRecognizer(clickRecognizer)
+    }
+    
+    func addDragGesture() {
+        cardView.addGestureRecognizer(dragRecognizer)
+    }
+    
+    func removeDragGesture() {
+        cardView.addGestureRecognizer(dragRecognizer)
     }
     
     @objc func cardClicked(_ sender: UITapGestureRecognizer) {

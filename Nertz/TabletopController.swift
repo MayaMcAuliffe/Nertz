@@ -9,12 +9,12 @@
 import Foundation
 import UIKit
 
-class TabletopController: CardGestureDelegate { // conforms to drag delegate
+class TabletopController: CardGestureDelegate, emptyDeckDelegate { // conforms to drag delegate
     let tabletopView: UIImageView
     let cardWidth: Int = 54
     let cardHeight: Int = 72
     let snapMargin: CGFloat = 30
-    let numCards = 52
+    let numCards = 0
     var numTurnUps = 4
     var numAces = 4
     let deckOrigin: CGPoint
@@ -53,7 +53,8 @@ class TabletopController: CardGestureDelegate { // conforms to drag delegate
     }
     
     func createEmptyDeckSpot() {
-        
+        let frame = CGRect(x: deckOrigin.x, y: deckOrigin.y, width: CGFloat (cardWidth), height: CGFloat (cardHeight))
+        _ = EmptyDeckSpotController(frame: frame, superview: tabletopView, gestureDel: self)
     }
     
     func createDeck() {
@@ -66,16 +67,7 @@ class TabletopController: CardGestureDelegate { // conforms to drag delegate
             let card = CardController(num: shuffleOrder[i], width: cardWidth, height: cardHeight, gestureDel: self)
             card.prepareForDeck(superview: self.tabletopView, location: deckOrigin)
             deckArray.append(card)
-            /* card.isUserInteractionEnabled = true
-            card.addClickDeckRecognizer(vc: self)
-            card.turnFaceDown()
-            tabletop.addSubview(card)
-            deck.append(card) */
         }
-    }
-    
-    func createTurnPile() {
-        
     }
     
     func createUndoButton() {
@@ -100,11 +92,56 @@ class TabletopController: CardGestureDelegate { // conforms to drag delegate
         cardController.turnFaceUp()
         deckArray.removeLast()
         pileArray.append(cardController)
+        cardController.removeClickGesture() // NOTE- IF I EVER WANT CARDS TO BE CLICKED ANYWHERE BESIDES DECK THIS WILL HAVE TO CHANGE
     }
     
     func cardDragged(cardController: CardController, gestureRecognizer: UIPanGestureRecognizer) {
         
     }
+    
+    func spotClicked(spotController: EmptyDeckSpotController, gestureRecognizer: UITapGestureRecognizer) {
+        print("spot clicked 2")
+        for i in (0..<pileArray.count).reversed() {
+            let cardController = pileArray[i]
+            
+            // model-wise put pile cards back into deck "flipped over"
+            deckArray.append(cardController)
+            pileArray.remove(at: i)
+            cardController.addClickGesture()
+            cardController.removeDragGesture()
+            
+            // view-wise, move cards back to deck
+            cardController.bringToFront(superview: tabletopView)
+            cardController.turnFaceDown()
+            cardController.animatedMoveTo(location: deckOrigin)
+        }
+    }
+}
+
+class EmptyDeckSpotController {
+    var gestureDelegate: emptyDeckDelegate
+    let deckSpotView: UIView
+    
+    init(frame: CGRect, superview: UIView, gestureDel: emptyDeckDelegate) {
+        print("spot created")
+        gestureDelegate = gestureDel
+        deckSpotView = UIView(frame: frame)
+        superview.addSubview(deckSpotView)
+        deckSpotView.backgroundColor = UIColor.black
+        deckSpotView.isUserInteractionEnabled = true
+        
+        let spotRecognizer = UITapGestureRecognizer(target: self, action: #selector(spotClicked(_:)))
+        deckSpotView.addGestureRecognizer(spotRecognizer)
+    }
+    
+    @objc func spotClicked(_ sender: UITapGestureRecognizer) {
+        print("spot clicked 1")
+        gestureDelegate.spotClicked(spotController: self, gestureRecognizer: sender)
+    }
+}
+
+protocol emptyDeckDelegate {
+    func spotClicked(spotController: EmptyDeckSpotController, gestureRecognizer: UITapGestureRecognizer)
 }
 
 extension MutableCollection {
